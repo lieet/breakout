@@ -37,3 +37,8 @@ void Ball::Update()
 	else if (y <= -3)
 		vely*=-1;
 }
+
+float Ball::getY()
+{
+	return this->y;
+}

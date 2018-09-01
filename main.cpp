@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "Ball.h"
 #include "Block.h"
+#include <string.h>
 using namespace std;
 
 float left = -4, right = 4, top = 3, bottom = -3;
@@ -39,7 +40,19 @@ void displayCallback() {
 	}
 
 	ball.Draw();
-	ball.Update();
+	
+	if(ball.getY() < -3){
+		//limpa a tela com a cor de fundo
+		glClear(GL_COLOR_BUFFER_BIT);
+		glColor3f(0, 0, 0);
+		glRasterPos2f(-1, 0);
+		char texto[20];
+		sprintf(texto, "Game Over");
+		for(int i = 0; i < strlen(texto); i++)
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
+	}else{
+		ball.Update();
+	}
 
 	glutSwapBuffers();
 	glFlush();
@@ -54,7 +67,7 @@ void keyboardCallback(unsigned char key, int x, int y) {
 		a -= 0.2;
 		d -= 0.2;
 	}
-	//move a barra pra desenhaireita
+	//move a barra pra direita
 	if (key == 'd' && d < 3.8) {
 		a += 0.2;
 		d += 0.2;

@@ -11,6 +11,7 @@ public:
 
 	void Draw();
 	void Update();
+	float getY();
 };
 
 #endif
