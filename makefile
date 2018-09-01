@@ -4,11 +4,14 @@ LIBS=-lGL -lGLU -lglut
 
 all: main
 
-main: main.o
-	$(COMPILER) -o main main.o $(LIBS)
+main: Ball.o main.o
+	$(COMPILER) -o main Ball.o main.o $(LIBS)
 
 main.o: main.cpp
 	$(COMPILER) -c main.cpp $(LIBS)
+
+Ball.o: Ball.cpp
+	$(COMPILER) -c Ball.cpp $(LIBS)
 
 clean:
 	$(RM) *.o

@@ -1,10 +1,14 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 #include <stdio.h>
+#include "Ball.h"
 using namespace std;
 
 float left = -4, right = 4, top = 3, bottom = -3;
-float a=-0.75,d=0.75; 
+float a=-0.75,d=0.75;
+
+// Objetos do jogo
+Ball ball(0, 0, 15);
 
 //desenha uma barra
 void barra(float x1, float y1, float x2, float y2){
@@ -35,6 +39,9 @@ void displayCallback() {
 		}
 		glColor3f(0, 1-i, i);
 	}
+
+	ball.Draw();
+	ball.Update();
 
 	glutSwapBuffers();
 	glFlush();
@@ -67,7 +74,7 @@ int main(int argc, char **argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(800, 600);
 	glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-800)/2, (glutGet(GLUT_SCREEN_HEIGHT)-600)/2);
-	glutCreateWindow("Breakout - By Emanoel Dantas e Lucas Aléssio");
+	glutCreateWindow("Breakout - By Emanoel Dantas e Lucas Alessio");
 	glutKeyboardFunc(keyboardCallback);
 	glutMouseFunc(NULL);
 	glutDisplayFunc(displayCallback);
