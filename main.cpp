@@ -2,6 +2,7 @@
 #include <GL/glu.h>
 #include <stdio.h>
 #include "Ball.h"
+#include "Block.h"
 using namespace std;
 
 float left = -4, right = 4, top = 3, bottom = -3;
@@ -9,11 +10,6 @@ float a=-0.75,d=0.75;
 
 // Objetos do jogo
 Ball ball(0, 0, 15);
-
-//desenha uma barra
-void barra(float x1, float y1, float x2, float y2){
-	glRectf(x1, y1, x2, y2);
-}
 
 void init() {
 	glClearColor(0.5, 0.5, 0.5, 0.0);
@@ -29,13 +25,15 @@ void displayCallback() {
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(0.2, 0.2, 0.2);
-	barra(a,-2,d,-2.3); //desenha a barra do jogador
+	Block block(a,-2,d,-2.3); //desenha a barra do jogador
+	block.Draw();
 
 	//desenha barras aleatorias
 	glColor3f(1, 0, 0);
 	for(float i = 0; i < 1.6; i += 0.4){
 		for(float j = -3.8; j < 3; j += 1.51){			
-			barra(j, 2.5-i, j+1.5, 2.8-i);
+			Block block(j, 2.5-i, j+1.5, 2.8-i);
+			block.Draw();
 		}
 		glColor3f(0, 1-i, i);
 	}
@@ -56,7 +54,7 @@ void keyboardCallback(unsigned char key, int x, int y) {
 		a -= 0.2;
 		d -= 0.2;
 	}
-	//move a barra pra direita
+	//move a barra pra desenhaireita
 	if (key == 'd' && d < 3.8) {
 		a += 0.2;
 		d += 0.2;
