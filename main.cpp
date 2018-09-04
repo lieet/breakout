@@ -1,9 +1,11 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 #include <stdio.h>
+#include <string>
+#include <vector>
+#include "Object.h"
 #include "Ball.h"
 #include "Block.h"
-#include <string.h>
 using namespace std;
 
 float left = -4, right = 4, top = 3, bottom = -3;
@@ -11,7 +13,8 @@ float a=-0.75,d=0.75;
 bool pause = false;
 
 // Objetos do jogo
-Ball ball(0, 0, 15);
+Ball ball(0, 0, 0.09);
+vector<Block> blocos;
 
 void init() {
 	glClearColor(0.5, 0.5, 0.5, 0.0);
@@ -29,36 +32,29 @@ void displayCallback() {
 	glLoadIdentity();
 
 	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(0.2, 0.2, 0.2);
-	Block block(a,-2,d,-2.3); //desenha a barra do jogador
+
+	//cria a barra do jogador
+	Block block(a,-2,d,-2.2, 0.2, 0.2, 0.2);
 	block.Draw();
+	block.Update();
 
-	//desenha barras aleatorias
-	glColor3f(1, 0, 0);
+	//cria barras aleatorias
 	for(float i = 0; i < 1.6; i += 0.4){
-		for(float j = -3.8; j < 3; j += 1.51){			
-			Block block(j, 2.5-i, j+1.5, 2.8-i);
-			block.Draw();
+		for(float j = -3.8; j < 3; j += 1.51){
+			Block block(j, 2.5-i, j+1.5, 2.7-i, 1, 1-i, i);
+			blocos.push_back(block);
 		}
-		glColor3f(0, 1-i, i);
 	}
 
+	//desenha as barras aleatorias
+	for(Block block: blocos){
+		block.Draw();
+		block.Update();
+	}
+
+	//desenha a bola
 	ball.Draw();
-
-	//primeira condição do game over
-	if(ball.getY() <= -3){
-		//limpa a tela com a cor de fundo
-		glClear(GL_COLOR_BUFFER_BIT);
-		glColor3f(0, 0, 0);
-		glRasterPos2f(-1.5, 0);
-		char texto[40];
-		sprintf(texto, "Game Over. Tecle r para reiniciar!");
-		for(int i = 0; i < strlen(texto); i++){
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
-		}
-	}else{
-		ball.Update(a,d);
-	}
+	ball.Update();
 
 	glutSwapBuffers();
 	glFlush();
@@ -76,8 +72,8 @@ void keyboardCallback(unsigned char key, int x, int y) {
 	if(key == 'r'){
 		a = -0.75;
 		d = 0.75;
-		ball.setX(0);
-		ball.setY(0);
+		ball.x = 0;
+		ball.y = 0;
 		pause = false;
 	}
 	//move a barra pra esquerda

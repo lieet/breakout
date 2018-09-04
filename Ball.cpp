@@ -1,61 +1,60 @@
 #include "Ball.h"
 #include <stdio.h>
+#include <string.h>
+#include <math.h>
 #include <GL/glut.h>
 #include <GL/glu.h>
 
 Ball::Ball(float x, float y, float raio)
 {
+	alive = true;
+
 	this->x = x;
 	this->y = y;
 	this->raio = raio;
-	velx = 0.03;
-	vely = 0.03;
+
+	r = 0;
+	g = 0;
+	b = 0;
+
+	velx = 0.035;
+	vely = 0.035;
 }
 
 void Ball::Draw()
 {
-	glEnable(GL_POINT_SMOOTH);
-	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-	glPointSize(raio);
-	glColor3f(0, 0, 0);
-	glBegin(GL_POINTS);
-	   glVertex2f(x,y);
+	glColor4f(r, g, b, 1);
+	glBegin(GL_POLYGON);
+		for(float a = 0; a < 2*M_PI; a+=0.1) {
+			glVertex2f(x + raio*cos(a), y + raio*sin(a));
+		}
 	glEnd();
 }
 
-void Ball::Update(float a, float d)
+void Ball::Update()
 {
-	x+=velx;
-	y+=vely;
-	
-	//verifica se colidiu com a barra do jogador
-	if(y < -2 && y > -2.15 && x > a && x < d){
-		y = -2;
-		vely*=-1;
+	if (alive) {
+		x+=velx;
+		y+=vely;
+
+		if (x >= 4)
+			velx*=-1;
+		else if (x <= -4)
+			velx*=-1;
+		else if (y >= 3)
+			vely*=-1;
+		else if (y <= -3) {
+			vely*=-1;
+			alive = false;
+		}
+	} else {
+		//limpa a tela com a cor de fundo
+		glClear(GL_COLOR_BUFFER_BIT);
+		glColor3f(0, 0, 0);
+		glRasterPos2f(-1, 0);
+		char texto[20];
+		sprintf(texto, "Game Over");
+		for(int i = 0; i < strlen(texto); i++)
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
 	}
-
-	if (x >= 4)
-		velx*=-1;
-	else if (x <= -4)
-		velx*=-1;
-	else if (y >= 3)
-		vely*=-1;
-	else if (y <= -3)
-		vely*=-1;
-
-}
-
-float Ball::getY()
-{
-	return this->y;
-}
-
-void Ball::setX(float x)
-{
-	this->x = x;
-}
-
-void Ball::setY(float y)
-{
-	this->y = y;
 }
