@@ -10,8 +10,10 @@ public:
 	Ball(float, float, float);
 
 	void Draw();
-	void Update();
+	void Update(float a, float d);
 	float getY();
+	void setX(float x);
+	void setY(float y);
 };
 
 #endif

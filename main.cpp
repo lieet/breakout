@@ -8,6 +8,7 @@ using namespace std;
 
 float left = -4, right = 4, top = 3, bottom = -3;
 float a=-0.75,d=0.75;
+bool pause = false;
 
 // Objetos do jogo
 Ball ball(0, 0, 15);
@@ -17,6 +18,9 @@ void init() {
 }
 
 void displayCallback() {
+	if(pause)
+		return;
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(left, right, bottom, top);
@@ -40,18 +44,20 @@ void displayCallback() {
 	}
 
 	ball.Draw();
-	
-	if(ball.getY() < -3){
+
+	//primeira condição do game over
+	if(ball.getY() <= -3){
 		//limpa a tela com a cor de fundo
 		glClear(GL_COLOR_BUFFER_BIT);
 		glColor3f(0, 0, 0);
-		glRasterPos2f(-1, 0);
-		char texto[20];
-		sprintf(texto, "Game Over");
-		for(int i = 0; i < strlen(texto); i++)
+		glRasterPos2f(-1.5, 0);
+		char texto[40];
+		sprintf(texto, "Game Over. Tecle r para reiniciar!");
+		for(int i = 0; i < strlen(texto); i++){
 			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
+		}
 	}else{
-		ball.Update();
+		ball.Update(a,d);
 	}
 
 	glutSwapBuffers();
@@ -61,6 +67,18 @@ void displayCallback() {
 void keyboardCallback(unsigned char key, int x, int y) {
 	if (key == 'q') {
 		exit(-1);
+	}
+	//pausa
+	if(key == 'p'){
+		pause = not pause;
+	}
+	//reinicia o jogo
+	if(key == 'r'){
+		a = -0.75;
+		d = 0.75;
+		ball.setX(0);
+		ball.setY(0);
+		pause = false;
 	}
 	//move a barra pra esquerda
 	if (key == 'a' && a > -3.8) {

@@ -23,10 +23,16 @@ void Ball::Draw()
 	glEnd();
 }
 
-void Ball::Update()
+void Ball::Update(float a, float d)
 {
 	x+=velx;
 	y+=vely;
+	
+	//verifica se colidiu com a barra do jogador
+	if(y < -2 && y > -2.15 && x > a && x < d){
+		y = -2;
+		vely*=-1;
+	}
 
 	if (x >= 4)
 		velx*=-1;
@@ -36,9 +42,20 @@ void Ball::Update()
 		vely*=-1;
 	else if (y <= -3)
 		vely*=-1;
+
 }
 
 float Ball::getY()
 {
 	return this->y;
+}
+
+void Ball::setX(float x)
+{
+	this->x = x;
+}
+
+void Ball::setY(float y)
+{
+	this->y = y;
 }
