@@ -2,6 +2,7 @@
 #define _BALL_H_
 
 #include "Object.h"
+#include "Block.h"
 
 class Ball : public Object {
 public:
@@ -13,6 +14,7 @@ public:
 
 	void Draw();
 	void Update();
+	bool checkCollision(Block);
 };
 
 #endif

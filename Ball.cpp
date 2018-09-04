@@ -17,8 +17,8 @@ Ball::Ball(float x, float y, float raio)
 	g = 0;
 	b = 0;
 
-	velx = 0.035;
-	vely = 0.035;
+	velx = 0.02;
+	vely = 0.02;
 }
 
 void Ball::Draw()
@@ -57,4 +57,24 @@ void Ball::Update()
 		for(int i = 0; i < strlen(texto); i++)
 			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
 	}
+}
+
+bool Ball::checkCollision(Block block)
+{
+	float point_x = x;
+	if (x < block.xi) point_x = block.xi;
+	if (x > block.xf) point_x = block.xf;
+
+	float point_y = y;
+	if (y < block.yi) point_y = block.yi;
+	if (y > block.yf) point_y = block.yf;
+
+	float distancia = sqrt(pow(x-point_x,2)+pow(y-point_y,2));
+
+	if (distancia <= raio) {
+		vely*=-1;
+		return true;
+	}
+
+	return false;
 }

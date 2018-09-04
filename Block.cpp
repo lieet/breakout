@@ -19,8 +19,10 @@ Block::Block(float xi, float yi, float xf, float yf, float r, float g, float b)
 
 void Block::Draw()
 {
-	glColor3f(r, g, b);
-	glRectf(xi, yi, xf, yf);
+	if (alive) {
+		glColor3f(r, g, b);
+		glRectf(xi, yi, xf, yf);
+	}
 }
 
 void Block::Update()
