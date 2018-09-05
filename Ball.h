@@ -6,7 +6,7 @@
 
 class Ball : public Object {
 public:
-	float x, y;				// posição (x, y) no plano
+	float x, y;				// posição (x, y) do centro do círculo no plano
 	float velx, vely;		// velocidade em cada coordenada
 	float raio;
 

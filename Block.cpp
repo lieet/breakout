@@ -1,12 +1,9 @@
 #include "Block.h"
-#include <stdio.h>
 #include <GL/glut.h>
 #include <GL/glu.h>
 
 Block::Block(float xi, float yi, float xf, float yf, float r, float g, float b)
 {
-	alive = true;
-
 	this->xi = xi;
 	this->yi = yi;
 	this->xf = xf;
@@ -19,10 +16,8 @@ Block::Block(float xi, float yi, float xf, float yf, float r, float g, float b)
 
 void Block::Draw()
 {
-	if (alive) {
-		glColor3f(r, g, b);
-		glRectf(xi, yi, xf, yf);
-	}
+	glColor3f(r, g, b);
+	glRectf(xi, yi, xf, yf);
 }
 
 void Block::Update()

@@ -1,14 +1,10 @@
 #include "Ball.h"
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
 #include <GL/glut.h>
 #include <GL/glu.h>
+#include <math.h>
 
 Ball::Ball(float x, float y, float raio)
 {
-	alive = true;
-
 	this->x = x;
 	this->y = y;
 	this->raio = raio;
@@ -33,30 +29,14 @@ void Ball::Draw()
 
 void Ball::Update()
 {
-	if (alive) {
-		x+=velx;
-		y+=vely;
+	x+=velx;
+	y+=vely;
 
-		if (x >= 4)
-			velx*=-1;
-		else if (x <= -4)
-			velx*=-1;
-		else if (y >= 3)
-			vely*=-1;
-		else if (y <= -3) {
-			vely*=-1;
-			alive = false;
-		}
-	} else {
-		//limpa a tela com a cor de fundo
-		glClear(GL_COLOR_BUFFER_BIT);
-		glColor3f(0, 0, 0);
-		glRasterPos2f(-1, 0);
-		char texto[20];
-		sprintf(texto, "Game Over");
-		for(int i = 0; i < strlen(texto); i++)
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
-	}
+	//verifica se a bola esta dentro das dimensões da tela
+	if (x <= 0 || x >= 8)
+		velx*=-1;
+	else if (y <= 0 || y >= 6)
+		vely*=-1;
 }
 
 bool Ball::checkCollision(Block block)
@@ -69,9 +49,9 @@ bool Ball::checkCollision(Block block)
 	if (y < block.yi) point_y = block.yi;
 	if (y > block.yf) point_y = block.yf;
 
-	float distancia = sqrt(pow(x-point_x,2)+pow(y-point_y,2));
+	float distancia = (x-point_x)*(x-point_x) + (y-point_y)*(y-point_y);
 
-	if (distancia <= raio) {
+	if (distancia <= raio*raio) {
 		vely*=-1;
 		return true;
 	}

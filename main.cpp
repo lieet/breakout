@@ -1,28 +1,35 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 #include <stdio.h>
-#include <string>
 #include <vector>
 #include "Object.h"
 #include "Ball.h"
 #include "Block.h"
 using namespace std;
 
-float left = -4, right = 4, top = 3, bottom = -3;
-float a=-0.75,d=0.75;
+float left = 0, right = 8, bottom = 0, top = 6;
+float a = 3.15, d = 4.75; //posição da barra do jogador no eixo x
 bool pause = false;
 
 // Objetos do jogo
-Ball ball(0, 0, 0.09);
+Ball ball(4, 1, 0.09);
 vector<Block> blocos;
 
 void init() {
+	a = 3.15;
+	d = 4.75;
+
+	ball.x = 4;
+	ball.y = 1;
+	ball.velx = 0.02;
+	ball.vely = 0.02;
+
 	glClearColor(0.5, 0.5, 0.5, 0.0);
 
 	//cria barras aleatorias
 	for(float i = 0; i < 1.6; i += 0.4){
-		for(float j = -3.8; j < 3; j += 1.51){
-			Block block(j, 2.5-i, j+1.5, 2.7-i, 1, 1-i, i);
+		for(float j = 0.2; j < 7; j += 1.51){
+			Block block(j, 5.5-i, j+1.5, 5.7-i, 1, 1-i, i);
 			blocos.push_back(block);
 		}
 	}
@@ -42,7 +49,7 @@ void displayCallback() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	//cria a barra do jogador
-	Block player_block(a,-2.6,d,-2.8, 0.2, 0.2, 0.2);
+	Block player_block(a, 0.4, d, 0.6, 0.2, 0.2, 0.2);
 	player_block.Draw();
 	player_block.Update();
 	ball.checkCollision(player_block);
@@ -55,14 +62,16 @@ void displayCallback() {
 	for (Block bloco: blocos){
 		ball.checkCollision(bloco);
 		bloco.Draw();
-		bloco.Update();
 	}
 
-	//verifica se colidiu com a barra do jogador
-	/* if(y < -2 && y > -2.15 && x > a && x < d){
-			y = -2;
-			vely*=-1;
-	}*/
+	//limpa a tela com a cor de fundo
+	/*glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0, 0, 0);
+	glRasterPos2f(-1, 0);
+	char texto[20];
+	sprintf(texto, "Game Over");
+	for(int i = 0; i < strlen(texto); i++)
+	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);*/
 
 	glutSwapBuffers();
 	glFlush();
@@ -78,24 +87,17 @@ void keyboardCallback(unsigned char key, int x, int y) {
 	}
 	//reinicia o jogo
 	if(key == 'r'){
-		a = -0.75;
-		d = 0.75;
-		ball.alive = true;
-		ball.x = 0;
-		ball.y = 0;
-		ball.velx = 0.02;
-		ball.vely = 0.02;
 		blocos.clear();
 		init();
 		pause = false;
 	}
 	//move a barra pra esquerda
-	if (key == 'a' && a > -3.8) {
+	if (key == 'a' && a > 0.2) {
 		a -= 0.2;
 		d -= 0.2;
 	}
 	//move a barra pra direita
-	if (key == 'd' && d < 3.8) {
+	if (key == 'd' && d < 7.8) {
 		a += 0.2;
 		d += 0.2;
 	}
