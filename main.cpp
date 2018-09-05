@@ -59,9 +59,15 @@ void displayCallback() {
 	ball.Update();
 
 	//desenha as barras aleatorias
-	for (Block bloco: blocos){
-		ball.checkCollision(bloco);
-		bloco.Draw();
+	vector<Block>::iterator iter;
+	for (iter = blocos.begin(); iter != blocos.end(); ) {
+		Block bloco = *iter;
+		if (ball.checkCollision(bloco))
+			blocos.erase(iter);
+		else {
+			bloco.Draw();
+			iter++;
+		}
 	}
 
 	//limpa a tela com a cor de fundo
