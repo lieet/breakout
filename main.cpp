@@ -23,6 +23,7 @@ void init() {
 
 	ball.x = 4;
 	ball.y = 0.7;
+	ball.moving = false;
 
 	glClearColor(0.5, 0.5, 0.5, 0.0);
 
