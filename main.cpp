@@ -1,18 +1,20 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 #include <stdio.h>
+#include <string.h>
 #include <vector>
 #include "Object.h"
 #include "Ball.h"
 #include "Block.h"
 using namespace std;
 
-float left = 0, right = 8, bottom = 0, top = 6;
+enum {PAUSED, RUNNING, GAME_OVER}; //possíveis estados para o jogo
+float left = 0, right = 8, bottom = 0, top = 6; //dimensões da tela
 float a = 3.15, d = 4.75; //posição da barra do jogador no eixo x
-bool pause = false;
+int game_state = RUNNING;
 
 // Objetos do jogo
-Ball ball(4, 1, 0.09);
+Ball ball(0.09);
 vector<Block> blocos;
 
 void init() {
@@ -20,9 +22,7 @@ void init() {
 	d = 4.75;
 
 	ball.x = 4;
-	ball.y = 1;
-	ball.velx = 0.02;
-	ball.vely = 0.02;
+	ball.y = 0.7;
 
 	glClearColor(0.5, 0.5, 0.5, 0.0);
 
@@ -35,19 +35,19 @@ void init() {
 	}
 }
 
-void displayCallback() {
-	if(pause)
-		return;
+//limpa a tela com a cor de fundo
+void gameOverState()
+{
+	glColor3f(0, 0, 0);
+	glRasterPos2f(3, 3);
+	char texto[20];
+	sprintf(texto, "Game Over");
+	for (int i = 0; i < strlen(texto); i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
+}
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(left, right, bottom, top);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glClear(GL_COLOR_BUFFER_BIT);
-
+void mainGame()
+{
 	//cria a barra do jogador
 	Block player_block(a, 0.4, d, 0.6, 0.2, 0.2, 0.2);
 	player_block.Draw();
@@ -58,26 +58,38 @@ void displayCallback() {
 	ball.Draw();
 	ball.Update();
 
+	//verifica se a bola ainda esta em jogo
+	if (ball.y < 0) game_state = GAME_OVER;
+
 	//desenha as barras aleatorias
 	vector<Block>::iterator iter;
 	for (iter = blocos.begin(); iter != blocos.end(); ) {
 		Block bloco = *iter;
-		if (ball.checkCollision(bloco))
+		if (ball.checkCollision(bloco)) {
 			blocos.erase(iter);
-		else {
+		} else {
 			bloco.Draw();
 			iter++;
 		}
 	}
+}
 
-	//limpa a tela com a cor de fundo
-	/*glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(0, 0, 0);
-	glRasterPos2f(-1, 0);
-	char texto[20];
-	sprintf(texto, "Game Over");
-	for(int i = 0; i < strlen(texto); i++)
-	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);*/
+void displayCallback() {
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(left, right, bottom, top);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	switch (game_state)
+	{
+		case GAME_OVER: gameOverState(); break;
+		case PAUSED:
+		case RUNNING: mainGame(); break;
+	}
 
 	glutSwapBuffers();
 	glFlush();
@@ -88,24 +100,37 @@ void keyboardCallback(unsigned char key, int x, int y) {
 		exit(-1);
 	}
 	//pausa
-	if(key == 'p'){
-		pause = not pause;
+	if (key == 'p'){
+		if (game_state == PAUSED) {
+			ball.moving = true;
+			game_state = RUNNING;
+		} else if (game_state == RUNNING) {
+			ball.moving = false;
+			game_state = PAUSED;
+		}
 	}
 	//reinicia o jogo
-	if(key == 'r'){
+	if (key == 'r'){
 		blocos.clear();
 		init();
-		pause = false;
 	}
-	//move a barra pra esquerda
-	if (key == 'a' && a > 0.2) {
-		a -= 0.2;
-		d -= 0.2;
-	}
-	//move a barra pra direita
-	if (key == 'd' && d < 7.8) {
-		a += 0.2;
-		d += 0.2;
+	if (game_state == RUNNING) {
+		//move a barra pra esquerda
+		if (key == 'a' && a > 0) {
+			if (not ball.moving and a>0) ball.x -= 0.2;
+			a -= 0.2;
+			d -= 0.2;
+		}
+		//move a barra pra direita
+		if (key == 'd' && d < 8) {
+			if (not ball.moving and d<8) ball.x += 0.2;
+			a += 0.2;
+			d += 0.2;
+		}
+		//verifica se a barra de espaço foi teclada para iniciar o jogo
+		if (key == 32) {
+			ball.moving = true;
+		}
 	}
 
 	glutPostRedisplay();

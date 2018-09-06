@@ -9,8 +9,9 @@ public:
 	float x, y;				// posição (x, y) do centro do círculo no plano
 	float velx, vely;		// velocidade em cada coordenada
 	float raio;
+	bool moving;			// indica se a bola está em movimento
 
-	Ball(float, float, float);
+	Ball(float);
 
 	void Draw();
 	void Update();
