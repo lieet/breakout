@@ -12,6 +12,7 @@ enum {PAUSED, RUNNING, GAME_OVER}; //possíveis estados para o jogo
 float left = 0, right = 8, bottom = 0, top = 6; //dimensões da tela
 float a = 3.15, d = 4.75; //posição da barra do jogador no eixo x
 int game_state = RUNNING;
+int score = 0;
 
 // Objetos do jogo
 Ball ball(0.09);
@@ -20,6 +21,7 @@ vector<Block> blocos;
 void init() {
 	a = 3.15;
 	d = 4.75;
+	score = 0;
 
 	ball.x = 4;
 	ball.y = 0.7;
@@ -34,6 +36,7 @@ void init() {
 			blocos.push_back(block);
 		}
 	}
+
 }
 
 //limpa a tela com a cor de fundo
@@ -43,6 +46,17 @@ void gameOverState()
 	glRasterPos2f(3, 3);
 	char texto[20];
 	sprintf(texto, "Game Over");
+	for (int i = 0; i < strlen(texto); i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
+}
+
+//Exibe a pontuação do jogador
+void printScore()
+{
+	glColor3f(0, 0, 0);
+	glRasterPos2f(0.2, 5.8);
+	char texto[20];
+	sprintf(texto, "Score: %d", score);
 	for (int i = 0; i < strlen(texto); i++)
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
 }
@@ -58,6 +72,7 @@ void mainGame()
 	//desenha a bola
 	ball.Draw();
 	ball.Update();
+	printScore();
 
 	//verifica se a bola ainda esta em jogo
 	if (ball.y < 0) game_state = GAME_OVER;
@@ -66,8 +81,9 @@ void mainGame()
 	vector<Block>::iterator iter;
 	for (iter = blocos.begin(); iter != blocos.end(); ) {
 		Block bloco = *iter;
-		if (ball.checkCollision(bloco)) {
+		if (ball.checkCollision(bloco)) { 
 			blocos.erase(iter);
+			score++;
 		} else {
 			bloco.Draw();
 			iter++;
@@ -114,6 +130,7 @@ void keyboardCallback(unsigned char key, int x, int y) {
 	if (key == 'r'){
 		blocos.clear();
 		init();
+		game_state = RUNNING;
 	}
 	if (game_state == RUNNING) {
 		//move a barra pra esquerda
