@@ -63,6 +63,17 @@ void printScore()
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
 }
 
+//Exibe o valor de cada barra
+void printValue(float x, float y, int value)
+{
+	glColor3f(0, 0, 0);
+	glRasterPos2f(x, y);
+	char texto[20];
+	sprintf(texto, "%d", value);
+	for (int i = 0; i < strlen(texto); i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, texto[i]);
+}
+
 void mainGame()
 {
 	//cria a barra do jogador
@@ -88,6 +99,7 @@ void mainGame()
 			score+= bloco.value;
 		} else {
 			bloco.Draw();
+			printValue((bloco.xf + bloco.xi)/2, bloco.yi+0.05, bloco.value);
 			iter++;
 		}
 	}
