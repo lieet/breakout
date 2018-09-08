@@ -6,8 +6,9 @@
 class Block : public Object {
 public:
 	float xi, yi, xf, yf;				// retângulo delimitado por (xi, yi) e (xf, yf)
+	int value;
 
-	Block(float, float, float, float, float, float, float);
+	Block(float, float, float, float, float, float, float, int);
 
 	void Draw();
 	void Update();

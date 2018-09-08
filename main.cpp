@@ -12,7 +12,7 @@ enum {PAUSED, RUNNING, GAME_OVER}; //possíveis estados para o jogo
 float left = 0, right = 8, bottom = 0, top = 6; //dimensões da tela
 float a = 3.15, d = 4.75; //posição da barra do jogador no eixo x
 int game_state = RUNNING;
-int score = 0;
+int score = 0, valueBlock = 20;
 
 // Objetos do jogo
 Ball ball(0.09);
@@ -22,6 +22,7 @@ void init() {
 	a = 3.15;
 	d = 4.75;
 	score = 0;
+	valueBlock = 20;
 
 	ball.x = 4;
 	ball.y = 0.7;
@@ -32,9 +33,10 @@ void init() {
 	//cria barras aleatorias
 	for(float i = 0; i < 1.6; i += 0.4){
 		for(float j = 0.2; j < 7; j += 1.51){
-			Block block(j, 5.5-i, j+1.5, 5.7-i, 1, 1-i, i);
+			Block block(j, 5.5-i, j+1.5, 5.7-i, 1, 1-i, i, valueBlock);
 			blocos.push_back(block);
 		}
+		valueBlock -= 5;
 	}
 
 }
@@ -64,7 +66,7 @@ void printScore()
 void mainGame()
 {
 	//cria a barra do jogador
-	Block player_block(a, 0.4, d, 0.6, 0.2, 0.2, 0.2);
+	Block player_block(a, 0.4, d, 0.6, 0.2, 0.2, 0.2, 0);
 	player_block.Draw();
 	player_block.Update();
 	ball.checkCollision(player_block);
@@ -83,7 +85,7 @@ void mainGame()
 		Block bloco = *iter;
 		if (ball.checkCollision(bloco)) { 
 			blocos.erase(iter);
-			score++;
+			score+= bloco.value;
 		} else {
 			bloco.Draw();
 			iter++;
