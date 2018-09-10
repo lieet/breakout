@@ -18,6 +18,48 @@ int score = 0, valueBlock = 20;
 Ball ball(0.09);
 vector<Block> blocos;
 
+//imprime a tela de instruções
+void instructions()
+{
+	glColor3f(0, 0, 0);
+	char texto[50];
+
+	glRasterPos2f(3, 2.6);
+	sprintf(texto, "q - exit");
+	for (int i = 0; i < strlen(texto); i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
+
+	glRasterPos2f(3, 2.8);
+	sprintf(texto, "p - pause\\unpause");
+	for (int i = 0; i < strlen(texto); i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
+	
+	glRasterPos2f(3, 3);
+	sprintf(texto, "r - restart");
+	for (int i = 0; i < strlen(texto); i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
+
+	glRasterPos2f(3, 3.2);
+	sprintf(texto, "a - move to the left");
+	for (int i = 0; i < strlen(texto); i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
+
+	glRasterPos2f(3, 3.4);
+	sprintf(texto, "d - move to the right");
+	for (int i = 0; i < strlen(texto); i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
+
+	glRasterPos2f(3, 3.6);
+	sprintf(texto, "space - start the game");
+	for (int i = 0; i < strlen(texto); i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
+
+	glRasterPos2f(3, 3.8);
+	sprintf(texto, "Keyboard Keys:");
+	for (int i = 0; i < strlen(texto); i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
+}
+
 void init() {
 	a = 3.15;
 	d = 4.75;
@@ -38,7 +80,6 @@ void init() {
 		}
 		valueBlock -= 5;
 	}
-
 }
 
 //limpa a tela com a cor de fundo
@@ -114,6 +155,8 @@ void displayCallback() {
 	glLoadIdentity();
 
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	if (not ball.moving) instructions();
 
 	switch (game_state)
 	{
