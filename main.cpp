@@ -8,15 +8,16 @@
 #include "Block.h"
 using namespace std;
 
-enum {PAUSED, RUNNING, GAME_OVER}; //possíveis estados para o jogo
+enum GameState {PAUSED, RUNNING, GAME_OVER} game_state; //possíveis estados para o jogo
+enum BlockType {PLAYER, GAME_PIECE}; //possíveis tipos de bloco
 float left = 0, right = 8, bottom = 0, top = 6; //dimensões da tela
-float a = 3.15, d = 4.75; //posição da barra do jogador no eixo x
-int game_state = RUNNING;
+float a, d; //posição da barra do jogador no eixo x
 int score = 0, valueBlock = 20;
 
 // Objetos do jogo
 Ball ball(0.09);
-vector<Block> blocos;
+vector<Block> blocosAtivos;
+vector<Block> blocosRemovidos;
 
 //imprime a tela de instruções
 void instructions()
@@ -75,11 +76,13 @@ void init() {
 	//cria barras aleatorias
 	for(float i = 0; i < 1.6; i += 0.4){
 		for(float j = 0.2; j < 7; j += 1.51){
-			Block block(j, 5.5-i, j+1.5, 5.7-i, 1, 1-i, i, valueBlock);
-			blocos.push_back(block);
+			Block block(j, 5.5-i, j+1.5, 5.7-i, 1, 1-i, i, valueBlock, GAME_PIECE);
+			blocosAtivos.push_back(block);
 		}
 		valueBlock -= 5;
 	}
+
+	game_state = RUNNING;
 }
 
 //limpa a tela com a cor de fundo
@@ -118,7 +121,7 @@ void printValue(float x, float y, int value)
 void mainGame()
 {
 	//cria a barra do jogador
-	Block player_block(a, 0.4, d, 0.6, 0.2, 0.2, 0.2, 0);
+	Block player_block(a, 0.4, d, 0.6, 0.2, 0.2, 0.2, 0, PLAYER);
 	player_block.Draw();
 	player_block.Update();
 	ball.checkCollision(player_block);
@@ -133,11 +136,12 @@ void mainGame()
 
 	//desenha as barras aleatorias
 	vector<Block>::iterator iter;
-	for (iter = blocos.begin(); iter != blocos.end(); ) {
+	for (iter = blocosAtivos.begin(); iter != blocosAtivos.end(); ) {
 		Block bloco = *iter;
 		if (ball.checkCollision(bloco)) { 
-			blocos.erase(iter);
-			score+= bloco.value;
+			blocosAtivos.erase(iter);
+			blocosRemovidos.push_back(bloco);
+			score += bloco.value;
 		} else {
 			bloco.Draw();
 			printValue((bloco.xf + bloco.xi)/2, bloco.yi+0.05, bloco.value);
@@ -185,7 +189,8 @@ void keyboardCallback(unsigned char key, int x, int y) {
 	}
 	//reinicia o jogo
 	if (key == 'r'){
-		blocos.clear();
+		blocosAtivos.clear();
+		blocosRemovidos.clear();
 		init();
 		game_state = RUNNING;
 	}
