@@ -2,6 +2,7 @@
 #include <GL/glu.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <vector>
 #include "Object.h"
 #include "Ball.h"
@@ -13,11 +14,17 @@ enum BlockType {PLAYER, GAME_PIECE}; //possíveis tipos de bloco
 float left = 0, right = 8, bottom = 0, top = 6; //dimensões da tela
 float a, d; //posição da barra do jogador no eixo x
 int score = 0, valueBlock = 20;
+int msToTimerFunc = 10000; //taxa de atualização, em ms, da função timer
 
 // Objetos do jogo
 Ball ball(0.09);
 vector<Block> blocosAtivos;
 vector<Block> blocosRemovidos;
+
+//valor inteiro aleatório entre 0 e maxValue
+int randomi(int maxValue) {
+	return rand() % maxValue;
+}
 
 //imprime a tela de instruções
 void instructions()
@@ -216,11 +223,25 @@ void keyboardCallback(unsigned char key, int x, int y) {
 	glutPostRedisplay();
 }
 
+//função executada periodicamente para inserir novos blocos
+void timer(int value)
+{
+	int n = blocosRemovidos.size();
+	if (n > 0){
+		int index = randomi(n);
+		blocosAtivos.push_back(blocosRemovidos.at(index));
+		blocosRemovidos.erase(blocosRemovidos.begin() + index);
+	}
+	glutPostRedisplay();
+	glutTimerFunc(msToTimerFunc, timer, 0);
+}
+
 void temporizador() {
 	glutPostRedisplay();
 }
 
 int main(int argc, char **argv) {
+	srand(time(NULL));
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(800, 600);
@@ -229,6 +250,7 @@ int main(int argc, char **argv) {
 	glutKeyboardFunc(keyboardCallback);
 	glutMouseFunc(NULL);
 	glutDisplayFunc(displayCallback);
+	glutTimerFunc(msToTimerFunc, timer, 0);
 	glutIdleFunc(temporizador);
 	init();
 	glutMainLoop();
