@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include <vector>
+#include "GameInfo.h"
 #include "Object.h"
 #include "Ball.h"
 #include "Block.h"
@@ -14,7 +15,7 @@ enum BlockType {PLAYER, GAME_PIECE}; //possíveis tipos de bloco
 float left = 0, right = 8, bottom = 0, top = 6; //dimensões da tela
 float a, d; //posição da barra do jogador no eixo x
 int score = 0, valueBlock = 20;
-int msToTimerFunc = 10000; //taxa de atualização, em ms, da função timer
+int msToTimerFunc = 15000; //taxa de atualização, em ms, da função timer
 
 // Objetos do jogo
 Ball ball(0.09);
@@ -24,48 +25,6 @@ vector<Block> blocosRemovidos;
 //valor inteiro aleatório entre 0 e maxValue
 int randomi(int maxValue) {
 	return rand() % maxValue;
-}
-
-//imprime a tela de instruções
-void instructions()
-{
-	glColor3f(0, 0, 0);
-	char texto[50];
-
-	glRasterPos2f(3, 2.6);
-	sprintf(texto, "q - exit");
-	for (int i = 0; i < strlen(texto); i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
-
-	glRasterPos2f(3, 2.8);
-	sprintf(texto, "p - pause\\unpause");
-	for (int i = 0; i < strlen(texto); i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
-	
-	glRasterPos2f(3, 3);
-	sprintf(texto, "r - restart");
-	for (int i = 0; i < strlen(texto); i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
-
-	glRasterPos2f(3, 3.2);
-	sprintf(texto, "a - move to the left");
-	for (int i = 0; i < strlen(texto); i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
-
-	glRasterPos2f(3, 3.4);
-	sprintf(texto, "d - move to the right");
-	for (int i = 0; i < strlen(texto); i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
-
-	glRasterPos2f(3, 3.6);
-	sprintf(texto, "space - start the game");
-	for (int i = 0; i < strlen(texto); i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
-
-	glRasterPos2f(3, 3.8);
-	sprintf(texto, "Keyboard Keys:");
-	for (int i = 0; i < strlen(texto); i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
 }
 
 void init() {
@@ -92,56 +51,24 @@ void init() {
 	game_state = RUNNING;
 }
 
-//limpa a tela com a cor de fundo
-void gameOverState()
-{
-	glColor3f(0, 0, 0);
-	glRasterPos2f(3, 3);
-	char texto[20];
-	sprintf(texto, "Game Over");
-	for (int i = 0; i < strlen(texto); i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
-}
-
-//Exibe a pontuação do jogador
-void printScore()
-{
-	glColor3f(0, 0, 0);
-	glRasterPos2f(0.2, 5.8);
-	char texto[20];
-	sprintf(texto, "Score: %d", score);
-	for (int i = 0; i < strlen(texto); i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
-}
-
-//Exibe o valor de cada barra
-void printValue(float x, float y, int value)
-{
-	glColor3f(0, 0, 0);
-	glRasterPos2f(x, y);
-	char texto[20];
-	sprintf(texto, "%d", value);
-	for (int i = 0; i < strlen(texto); i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, texto[i]);
-}
-
 void mainGame()
 {
-	//cria a barra do jogador
-	Block player_block(a, 0.4, d, 0.6, 0.2, 0.2, 0.2, 0, PLAYER);
-	player_block.Draw();
-	player_block.Update();
-	ball.checkCollision(player_block);
+	printScore(score);
 
 	//desenha a bola
 	ball.Draw();
 	ball.Update();
-	printScore();
 
 	//verifica se a bola ainda esta em jogo
 	if (ball.y < 0) game_state = GAME_OVER;
 
-	//desenha as barras aleatorias
+	//cria a barra do jogador
+	Block player_block(a, 0.4, d, 0.6, 0.2, 0.2, 0.2, 0, PLAYER);
+	player_block.Draw();
+
+	ball.checkCollision(player_block);
+
+	//atualiza as barras aleatorias
 	vector<Block>::iterator iter;
 	for (iter = blocosAtivos.begin(); iter != blocosAtivos.end(); ) {
 		Block bloco = *iter;
@@ -161,10 +88,6 @@ void displayCallback() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(left, right, bottom, top);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	if (not ball.moving) instructions();
@@ -219,25 +142,17 @@ void keyboardCallback(unsigned char key, int x, int y) {
 			ball.moving = true;
 		}
 	}
-
-	glutPostRedisplay();
 }
 
 //função executada periodicamente para inserir novos blocos
-void timer(int value)
-{
+void reporBlocos(int value) {
 	int n = blocosRemovidos.size();
 	if (n > 0){
 		int index = randomi(n);
 		blocosAtivos.push_back(blocosRemovidos.at(index));
 		blocosRemovidos.erase(blocosRemovidos.begin() + index);
 	}
-	glutPostRedisplay();
-	glutTimerFunc(msToTimerFunc, timer, 0);
-}
-
-void temporizador() {
-	glutPostRedisplay();
+	glutTimerFunc(msToTimerFunc, reporBlocos, 0);
 }
 
 int main(int argc, char **argv) {
@@ -250,8 +165,8 @@ int main(int argc, char **argv) {
 	glutKeyboardFunc(keyboardCallback);
 	glutMouseFunc(NULL);
 	glutDisplayFunc(displayCallback);
-	glutTimerFunc(msToTimerFunc, timer, 0);
-	glutIdleFunc(temporizador);
+	glutTimerFunc(msToTimerFunc, reporBlocos, 0);
+	glutIdleFunc(displayCallback);
 	init();
 	glutMainLoop();
 

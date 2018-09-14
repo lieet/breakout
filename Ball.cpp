@@ -11,8 +11,8 @@ Ball::Ball(float raio)
 	g = 0;
 	b = 0;
 
-	velx = 0.03;
-	vely = 0.03;
+	velx = 0.035;
+	vely = 0.035;
 }
 
 void Ball::Draw()
