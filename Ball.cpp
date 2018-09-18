@@ -30,7 +30,7 @@ void Ball::Update()
 	//verifica se a bola esta dentro das dimensões da tela
 	if (x <= 0 || x > 8)
 		velx*=-1;
-	else if (y < 0 || y > 6)
+	if (y < 0 || y > 6)
 		vely*=-1;
 	
 	if (moving)

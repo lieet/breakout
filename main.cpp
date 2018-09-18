@@ -153,12 +153,17 @@ void keyboardCallback(unsigned char key, int x, int y) {
 }
 
 //função executada periodicamente para inserir novos blocos
-void reporBlocos(int value) {
-	int n = blocosRemovidos.size();
-	if (n > 0){
-		int index = randomi(n);
-		blocosAtivos.push_back(blocosRemovidos.at(index));
-		blocosRemovidos.erase(blocosRemovidos.begin() + index);
+void reporBlocos(int value)
+{
+	if (game_state == RUNNING)
+	{
+		int n = blocosRemovidos.size();
+		if (n > 0)
+		{
+			int index = randomi(n);
+			blocosAtivos.push_back(blocosRemovidos.at(index));
+			blocosRemovidos.erase(blocosRemovidos.begin() + index);
+		}
 	}
 	glutTimerFunc(msToTimerFunc, reporBlocos, 0);
 }
