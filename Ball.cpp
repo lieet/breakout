@@ -27,16 +27,14 @@ void Ball::Draw()
 
 void Ball::Update()
 {
-	if (moving) {
-		x+=velx;
-		y+=vely;
-
-		//verifica se a bola esta dentro das dimensões da tela
-		if (x <= 0 || x >= 8)
-			velx*=-1;
-		else if (y <= 0 || y >= 6)
-			vely*=-1;
-	}
+	//verifica se a bola esta dentro das dimensões da tela
+	if (x <= 0 || x > 8)
+		velx*=-1;
+	if (y < 0 || y > 6)
+		vely*=-1;
+	
+	if (moving)
+		Move(velx, vely);
 }
 
 //algorithm: https://yal.cc/rectangle-circle-intersection-test/
@@ -61,4 +59,14 @@ bool Ball::checkCollision(Block block)
 	}
 
 	return false;
+}
+
+void Ball::Move(float x, float y)
+{
+	glPushMatrix();
+		glTranslatef(x, y, 0);
+		Draw();
+	glPopMatrix();
+	this->x += x;
+	this->y += y;
 }

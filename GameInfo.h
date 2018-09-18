@@ -43,13 +43,22 @@ void instructions()
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
 }
 
-//limpa a tela com a cor de fundo
 void gameOverState()
 {
 	glColor3f(0, 0, 0);
 	glRasterPos2f(3, 3);
 	char texto[20];
 	sprintf(texto, "Game Over");
+	for (int i = 0; i < strlen(texto); i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
+}
+
+void gameWonState()
+{
+	glColor3f(0, 0, 0);
+	glRasterPos2f(3, 3);
+	char texto[20];
+	sprintf(texto, "You Won !!!");
 	for (int i = 0; i < strlen(texto); i++)
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, texto[i]);
 }
