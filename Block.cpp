@@ -2,7 +2,7 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 
-Block::Block(float xi, float yi, float xf, float yf, float r, float g, float b, int v, int tipo)
+Block::Block(float xi, float yi, float xf, float yf, float r, float g, float b, int v)
 {
 	this->xi = xi;
 	this->yi = yi;
@@ -13,8 +13,6 @@ Block::Block(float xi, float yi, float xf, float yf, float r, float g, float b, 
 	this->r = r;
 	this->g = g;
 	this->b = b;
-
-	this->tipo = tipo;
 }
 
 void Block::Draw()

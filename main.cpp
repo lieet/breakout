@@ -10,15 +10,14 @@
 #include "Block.h"
 using namespace std;
 
-enum GameState {PAUSED, RUNNING, GAME_OVER} game_state; //possíveis estados para o jogo
-enum BlockType {PLAYER, GAME_PIECE}; //possíveis tipos de bloco
+enum GameState {PAUSED, RUNNING, GAME_OVER, GAME_WON} game_state; //possíveis estados para o jogo
 const float left = 0, right = 8, bottom = 0, top = 6; //dimensões da tela
 int score, valueBlock;
-int msToTimerFunc = 15000; //taxa de atualização, em ms, da função timer
+int msToTimerFunc = 20000; //taxa de atualização, em ms, da função timer
 
 // Objetos do jogo
 Ball ball(0.09);
-Block player_block(3.15, 0.4, 4.75, 0.6, 0.2, 0.2, 0.2, 0, PLAYER);
+Block player_block(3.15, 0.4, 4.75, 0.6, 0.2, 0.2, 0.2, 0);
 vector<Block> blocosAtivos;
 vector<Block> blocosRemovidos;
 
@@ -33,14 +32,19 @@ void init() {
 
 	ball.x = 4;
 	ball.y = 0.7;
+	ball.velx = 0.035;
+	ball.vely = 0.035;
 	ball.moving = false;
+
+	player_block.xi = 3.15;
+	player_block.xf = 4.75;
 
 	glClearColor(0.5, 0.5, 0.5, 0.0);
 
 	//cria barras aleatorias
 	for(float i = 0; i < 1.6; i += 0.4){
 		for(float j = 0.2; j < 7; j += 1.51){
-			Block block(j, 5.5-i, j+1.5, 5.7-i, 1, 1-i, i, valueBlock, GAME_PIECE);
+			Block block(j, 5.5-i, j+1.5, 5.7-i, 1, 1-i, i, valueBlock);
 			blocosAtivos.push_back(block);
 		}
 		valueBlock -= 5;
@@ -57,11 +61,14 @@ void mainGame()
 	ball.Update();
 
 	//verifica se a bola ainda esta em jogo
-	if (ball.y < 0) game_state = GAME_OVER;
+	if (ball.y < 0)
+		game_state = GAME_OVER;
+
+	if (blocosAtivos.empty())
+		game_state = GAME_WON;
 
 	//cria a barra do jogador
 	player_block.Draw();
-
 	ball.checkCollision(player_block);
 
 	//atualiza as barras aleatorias
@@ -95,6 +102,7 @@ void displayCallback() {
 	switch (game_state)
 	{
 		case GAME_OVER: gameOverState(); break;
+		case GAME_WON: gameWonState(); break;
 		case PAUSED:
 		case RUNNING: mainGame(); break;
 	}
@@ -126,14 +134,14 @@ void keyboardCallback(unsigned char key, int x, int y) {
 	}
 	if (game_state == RUNNING) {
 		//move a barra pra esquerda
-		if (key == 'a' && player_block.xi > 0) {
-			if (not ball.moving and player_block.xi > left)
+		if (key == 'a' && player_block.xi > left) {
+			if (not ball.moving)
 				ball.Move(-0.2, 0);
 			player_block.Move(-0.2, 0);
 		}
 		//move a barra pra direita
-		if (key == 'd' && player_block.xf < 8) {
-			if (not ball.moving and player_block.xf < right)
+		if (key == 'd' && player_block.xf < right) {
+			if (not ball.moving)
 				ball.Move(0.2, 0);
 			player_block.Move(0.2, 0);
 		}
