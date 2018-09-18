@@ -26,3 +26,15 @@ void Block::Draw()
 void Block::Update()
 {
 }
+
+void Block::Move(float x, float y)
+{
+	glPushMatrix();
+		glTranslatef(x, y, 0);
+		Draw();
+	glPopMatrix();
+	xi += x;
+	xf += x;
+	yi += y;
+	yf += y;
+}

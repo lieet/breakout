@@ -12,13 +12,13 @@ using namespace std;
 
 enum GameState {PAUSED, RUNNING, GAME_OVER} game_state; //possíveis estados para o jogo
 enum BlockType {PLAYER, GAME_PIECE}; //possíveis tipos de bloco
-float left = 0, right = 8, bottom = 0, top = 6; //dimensões da tela
-float a, d; //posição da barra do jogador no eixo x
-int score = 0, valueBlock = 20;
+const float left = 0, right = 8, bottom = 0, top = 6; //dimensões da tela
+int score, valueBlock;
 int msToTimerFunc = 15000; //taxa de atualização, em ms, da função timer
 
 // Objetos do jogo
 Ball ball(0.09);
+Block player_block(3.15, 0.4, 4.75, 0.6, 0.2, 0.2, 0.2, 0, PLAYER);
 vector<Block> blocosAtivos;
 vector<Block> blocosRemovidos;
 
@@ -28,8 +28,6 @@ int randomi(int maxValue) {
 }
 
 void init() {
-	a = 3.15;
-	d = 4.75;
 	score = 0;
 	valueBlock = 20;
 
@@ -56,14 +54,12 @@ void mainGame()
 	printScore(score);
 
 	//desenha a bola
-	ball.Draw();
 	ball.Update();
 
 	//verifica se a bola ainda esta em jogo
 	if (ball.y < 0) game_state = GAME_OVER;
 
 	//cria a barra do jogador
-	Block player_block(a, 0.4, d, 0.6, 0.2, 0.2, 0.2, 0, PLAYER);
 	player_block.Draw();
 
 	ball.checkCollision(player_block);
@@ -90,7 +86,11 @@ void displayCallback() {
 	gluOrtho2D(left, right, bottom, top);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	if (not ball.moving) instructions();
+	if (not ball.moving)
+	{
+		ball.Draw();
+		instructions();
+	}
 
 	switch (game_state)
 	{
@@ -126,16 +126,16 @@ void keyboardCallback(unsigned char key, int x, int y) {
 	}
 	if (game_state == RUNNING) {
 		//move a barra pra esquerda
-		if (key == 'a' && a > 0) {
-			if (not ball.moving and a>0) ball.x -= 0.2;
-			a -= 0.2;
-			d -= 0.2;
+		if (key == 'a' && player_block.xi > 0) {
+			if (not ball.moving and player_block.xi > left)
+				ball.Move(-0.2, 0);
+			player_block.Move(-0.2, 0);
 		}
 		//move a barra pra direita
-		if (key == 'd' && d < 8) {
-			if (not ball.moving and d<8) ball.x += 0.2;
-			a += 0.2;
-			d += 0.2;
+		if (key == 'd' && player_block.xf < 8) {
+			if (not ball.moving and player_block.xf < right)
+				ball.Move(0.2, 0);
+			player_block.Move(0.2, 0);
 		}
 		//verifica se a barra de espaço foi teclada para iniciar o jogo
 		if (key == 32) {

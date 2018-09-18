@@ -28,8 +28,7 @@ void Ball::Draw()
 void Ball::Update()
 {
 	if (moving) {
-		x+=velx;
-		y+=vely;
+		Move(velx, vely);
 
 		//verifica se a bola esta dentro das dimensões da tela
 		if (x <= 0 || x >= 8)
@@ -61,4 +60,14 @@ bool Ball::checkCollision(Block block)
 	}
 
 	return false;
+}
+
+void Ball::Move(float x, float y)
+{
+	glPushMatrix();
+		glTranslatef(x, y, 0);
+		Draw();
+	glPopMatrix();
+	this->x += x;
+	this->y += y;
 }

@@ -13,6 +13,7 @@ public:
 
 	void Draw();
 	void Update();
+	void Move(float, float);
 };
 
 #endif

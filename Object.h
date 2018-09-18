@@ -7,6 +7,7 @@ public:
 
 	virtual void Draw() {};
 	virtual void Update() {};
+	virtual void Move(float, float) {};
 };
 
 #endif
