@@ -5,14 +5,17 @@
 
 class Block : public Object {
 public:
-	float xi, yi, xf, yf;				// retângulo delimitado por (xi, yi) e (xf, yf)
-	int value;							// pontuação pela remoção do bloco
+	int value, size;
 
-	Block(float, float, float, float, float, float, float, int);
+	Block(float, float, float, float, float, int, int);
 
 	void Draw();
 	void Update();
 	void Move(float, float);
+	float getXi();
+	float getXf();
+	float getYi();
+	float getYf();
 };
 
 #endif

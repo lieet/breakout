@@ -1,3 +1,4 @@
+#include "Constants.h"
 #include "Ball.h"
 #include <GL/glut.h>
 #include <GL/glu.h>
@@ -7,66 +8,68 @@ Ball::Ball(float raio)
 {
 	this->raio = raio;
 
-	r = 0;
-	g = 0;
-	b = 0;
+	this->r = 0;
+	this->g = 0;
+	this->b = 0;
 
-	velx = 0.035;
-	vely = 0.035;
+	this->scalex = .5;
+	this->scaley = .5;
+	this->scalez = .5;
+
+	this->velx = ballSpeed;
+	this->vely = ballSpeed;
 }
 
 void Ball::Draw()
 {
 	glColor4f(r, g, b, 1);
-	glBegin(GL_POLYGON);
-		for(float a = 0; a < 2*M_PI; a+=0.1) {
-			glVertex2f(x + raio*cos(a), y + raio*sin(a));
-		}
-	glEnd();
+	glPushMatrix();
+		glTranslatef(x, y, 0);
+		glScalef(scalex, scaley, scalez);
+		glutSolidSphere(1, 50, 50);
+	glPopMatrix();
 }
 
 void Ball::Update()
 {
 	//verifica se a bola esta dentro das dimensões da tela
-	if (x <= 0 || x > 8)
+	if (this->getXi() <= left || this->getXf() >= right)
 		velx*=-1;
-	if (y < 0 || y > 6)
+	if (this->getYi() <= bottom || this->getYf() >= top)
 		vely*=-1;
 	
 	if (moving)
 		Move(velx, vely);
 }
 
-//algorithm: https://yal.cc/rectangle-circle-intersection-test/
 bool Ball::checkCollision(Block block)
 {
-	float min_x = x;
-	if (block.xf < min_x) min_x = block.xf;
-	float min_y = y;
-	if (block.yf < min_y) min_y = block.yf;
-
-	float nearest_x = block.xi;
-	if (min_x > nearest_x) nearest_x = min_x;
-	float nearest_y = block.yi;
-	if (min_y > nearest_y) nearest_y = min_y;
-
-	float delta_x = x - nearest_x;
-	float delta_y = y - nearest_y;
-
-	if (delta_x*delta_x + delta_y*delta_y < raio*raio) {
-		vely*=-1;
-		return true;
-	}
-
 	return false;
 }
 
 void Ball::Move(float x, float y)
 {
-	glPushMatrix();
-		glTranslatef(x, y, 0);
-		Draw();
-	glPopMatrix();
 	this->x += x;
 	this->y += y;
+	Draw();
+}
+
+float Ball::getXi()
+{
+	return x - 2*scalex;
+}
+
+float Ball::getXf()
+{
+	return x + 2*scalex;
+}
+
+float Ball::getYi()
+{
+	return y - 2*scaley;
+}
+
+float Ball::getYf()
+{
+	return y + 2*scaley;
 }

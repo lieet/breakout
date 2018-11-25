@@ -6,7 +6,6 @@
 
 class Ball : public Object {
 public:
-	float x, y;				// posição (x, y) do centro do círculo no plano
 	float velx, vely;		// velocidade em cada coordenada
 	float raio;
 	bool moving;			// indica se a bola está em movimento
@@ -17,6 +16,10 @@ public:
 	void Update();
 	void Move(float, float);
 	bool checkCollision(Block);
+	float getXi();
+	float getXf();
+	float getYi();
+	float getYf();
 };
 
 #endif
