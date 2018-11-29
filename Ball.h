@@ -13,6 +13,7 @@ public:
 	Ball(float);
 
 	void Draw();
+	void DrawBoundingBox();
 	void Update();
 	void Move(float, float);
 	bool checkCollision(Block);

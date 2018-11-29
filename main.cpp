@@ -15,7 +15,7 @@ using namespace std;
 int score, valueBlock;
 float anglex, angley, z;
 enum GameState {PAUSED, RUNNING, GAME_OVER, GAME_WON} game_state; //possíveis estados para o jogo
-bool showTextDetails = false;
+bool showTextDetails = false, drawBB = true, acompanharBall = false;
 
 // Objetos do jogo
 Ball ball(1);
@@ -54,13 +54,13 @@ void init() {
 
 	anglex = 0;
 	angley = 0;
-	z = 20;
+	z = MAX_ZOOM_IN;
 
 	score = 0;
 	valueBlock = 20;
 
 	ball.x = (left+right)/2;
-	ball.y = bottom+3;
+	ball.y = bottom+2.5;
 	ball.velx = ballSpeed;
 	ball.vely = ballSpeed;
 	ball.moving = false;
@@ -70,11 +70,11 @@ void init() {
 	glClearColor(0.5, 0.5, 0.5, 0.0);
 
 	//cria barras aleatorias
-	for (float i = left+5; i < right; i += 5)
+	for (float i = left+5; i < right-5; i += 6)
 	{
 		for (float j = top-10; j < top-2; j += 2)
 		{
-			Block block(i, j, 1, (1-i)/20, i/20, valueBlock, 1);
+			Block block(i, j, .5, 1-j/top, j/top, valueBlock, 1);
 			blocosAtivos.push_back(block);
 		}
 		valueBlock -= 5;
@@ -85,12 +85,15 @@ void init() {
 
 void mainGame()
 {
-	drawGameLimits();
+	if (drawBB)
+		drawGameLimits();
 	if (showTextDetails)
 		printScore(score);
 
 	//desenha a bola
 	ball.Update();
+	if (drawBB)
+		ball.DrawBoundingBox();
 
 	//verifica se a bola ainda esta em jogo
 	if (ball.y <= bottom)
@@ -101,6 +104,8 @@ void mainGame()
 
 	//cria a barra do jogador
 	player_block.Draw();
+	if (drawBB)
+		player_block.DrawBoundingBox();
 	ball.checkCollision(player_block);
 
 	//atualiza as barras aleatorias
@@ -113,6 +118,8 @@ void mainGame()
 			score += bloco.value;
 		} else {
 			bloco.Draw();
+			if (drawBB)
+				bloco.DrawBoundingBox();
 			if (showTextDetails)
 				printValue(bloco.x/2, bloco.y+0.1, bloco.value);
 			iter++;
@@ -122,8 +129,16 @@ void mainGame()
 
 void atualizarCamera()
 {
-	float centerx = (left+right)/2;
-	float centery = (bottom+top)/2;
+	float centerx = (left+right)/2.0;
+	if (angley >= 50)
+		centerx = player_block.x;
+	float centery = (bottom+top)/2.0;
+
+	if (acompanharBall)
+	{
+		centerx = ball.x;
+		centery = ball.y;
+	}
 
 	float radianx = anglex*PI/180;
 	float radiany = angley*PI/180;
@@ -145,6 +160,8 @@ void displayCallback() {
 	if (not ball.moving)
 	{
 		ball.Draw();
+		if (drawBB)
+			ball.DrawBoundingBox();
 		if (showTextDetails)
 			instructions();
 	}
@@ -186,14 +203,14 @@ void keyboardCallback(unsigned char key, int x, int y) {
 		if (key == 'd' && player_block.getXi() > left)
 		{
 			if (not ball.moving)
-				ball.Move(-0.4, 0);
-			player_block.Move(-0.4, 0);
+				ball.Move(-playerMove, 0);
+			player_block.Move(-playerMove, 0);
 		}
 		if (key == 'a' && player_block.getXf() < right)
 		{
 			if (not ball.moving)
-				ball.Move(0.4, 0);
-			player_block.Move(0.4, 0);
+				ball.Move(playerMove, 0);
+			player_block.Move(playerMove, 0);
 		}
 		//verifica se a barra de espaço foi teclada para iniciar o jogo
 		if (key == 32)
@@ -202,18 +219,21 @@ void keyboardCallback(unsigned char key, int x, int y) {
 		}
 	}
 	//move a camera
-	if(key == 'j')
-		anglex -= 10;
-	else if(key == 'l')
-		anglex += 10;
-	else if(key == 'k')
+	if(key == 'k' and angley > MIN_ANGLE_Y)
 		angley -= 10;
-	else if(key == 'i')
+	else if(key == 'i' and angley < MAX_ANGLE_Y)
 		angley += 10;
-	else if(key == 'u')
+	else if(key == 'u' and z > MAX_ZOOM_IN)
 		z -= 2;
-	else if(key == 'o')
+	else if(key == 'o' and z < MAX_ZOOM_OUT)
 		z += 2;
+
+	if(key == 'b')
+		drawBB = not drawBB;
+	if(key == 't')
+		showTextDetails = not showTextDetails;
+	if(key == 'z')
+		acompanharBall = not acompanharBall;
 }
 
 //função executada periodicamente para inserir novos blocos
@@ -229,20 +249,20 @@ void reporBlocos(int value)
 			blocosRemovidos.erase(blocosRemovidos.begin() + index);
 		}
 	}
-	glutTimerFunc(msToTimerFunc, reporBlocos, 0);
+	glutTimerFunc(updateTimerMs, reporBlocos, 0);
 }
 
 int main(int argc, char **argv) {
 	srand(time(NULL));
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(800, 600);
-	glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-800)/2, (glutGet(GLUT_SCREEN_HEIGHT)-600)/2);
+	glutInitWindowSize(WIDTH, HEIGHT);
+	glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-WIDTH)/2, (glutGet(GLUT_SCREEN_HEIGHT)-HEIGHT)/2);
 	glutCreateWindow("Breakout - By Emanoel Dantas e Lucas Alessio");
 	glutKeyboardFunc(keyboardCallback);
 	glutMouseFunc(NULL);
 	glutDisplayFunc(displayCallback);
-	glutTimerFunc(msToTimerFunc, reporBlocos, 0);
+	glutTimerFunc(updateTimerMs, reporBlocos, 0);
 	glutIdleFunc(displayCallback);
 	init();
 	glutMainLoop();

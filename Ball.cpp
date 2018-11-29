@@ -30,6 +30,16 @@ void Ball::Draw()
 	glPopMatrix();
 }
 
+void Ball::DrawBoundingBox()
+{
+	glColor4f(1-r, 1-g, 1-b, 1);
+	glBegin(GL_LINE_LOOP);
+		for(float a = 0; a < 2*M_PI; a+=0.1) {
+			glVertex2f(x + raio/2.0*cos(a), y + raio/2.0*sin(a));
+		}
+	glEnd();
+}
+
 void Ball::Update()
 {
 	//verifica se a bola esta dentro das dimensões da tela
@@ -44,6 +54,24 @@ void Ball::Update()
 
 bool Ball::checkCollision(Block block)
 {
+	float min_x = x;
+	if (block.getXf() < min_x) min_x = block.getXf();
+	float min_y = y;
+	if (block.getYf() < min_y) min_y = block.getYf();
+	float nearest_x = block.getXi();
+	if (min_x > nearest_x) nearest_x = min_x;
+	float nearest_y = block.getYi();
+	if (min_y > nearest_y) nearest_y = min_y;
+	float delta_x = x - nearest_x;
+	float delta_y = y - nearest_y;
+	if (delta_x*delta_x + delta_y*delta_y < raio*raio) {
+		if (delta_y != 0)
+			vely*=-1;
+		if (delta_x != 0)
+			velx*=-1;
+
+		return true;
+	}
 	return false;
 }
 
@@ -56,20 +84,20 @@ void Ball::Move(float x, float y)
 
 float Ball::getXi()
 {
-	return x - 2*scalex;
+	return x - raio;
 }
 
 float Ball::getXf()
 {
-	return x + 2*scalex;
+	return x + raio;
 }
 
 float Ball::getYi()
 {
-	return y - 2*scaley;
+	return y - raio;
 }
 
 float Ball::getYf()
 {
-	return y + 2*scaley;
+	return y + raio;
 }

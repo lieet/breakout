@@ -21,3 +21,5 @@ clean:
 
 distclean: clean
 	$(RM) main
+
+remake: distclean all

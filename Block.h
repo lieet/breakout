@@ -10,6 +10,7 @@ public:
 	Block(float, float, float, float, float, int, int);
 
 	void Draw();
+	void DrawBoundingBox();
 	void Update();
 	void Move(float, float);
 	float getXi();

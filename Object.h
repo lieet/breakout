@@ -8,6 +8,7 @@ public:
 	float scalex, scaley, scalez;
 
 	virtual void Draw() {};
+	virtual void DrawBoundingBox() {};
 	virtual void Update() {};
 	virtual void Move(float, float) {};
 	virtual float getXi() {};
