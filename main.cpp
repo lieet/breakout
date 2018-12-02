@@ -121,7 +121,7 @@ void mainGame()
 			if (drawBB)
 				bloco.DrawBoundingBox();
 			if (showTextDetails)
-				printValue(bloco.x/2, bloco.y+0.1, bloco.value);
+				printValue(bloco.x, bloco.y, bloco.value);
 			iter++;
 		}
 	}
@@ -162,8 +162,6 @@ void displayCallback() {
 		ball.Draw();
 		if (drawBB)
 			ball.DrawBoundingBox();
-		if (showTextDetails)
-			instructions();
 	}
 
 	switch (game_state)
@@ -234,6 +232,9 @@ void keyboardCallback(unsigned char key, int x, int y) {
 		showTextDetails = not showTextDetails;
 	if(key == 'z')
 		acompanharBall = not acompanharBall;
+
+	if (key == 'c')
+		printf("c - commands:\n\nq - exit\np - pause/unpause\nr - restart\nd/a - move player\nspace - start the game\n\nk/i - move the camera\nu/o - zoom\nz - follow the ball\n\nb - draw bounding boxes\nt - show text details\n");
 }
 
 //função executada periodicamente para inserir novos blocos

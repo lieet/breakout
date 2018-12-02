@@ -45,7 +45,7 @@ void Ball::Update()
 	//verifica se a bola esta dentro das dimensões da tela
 	if (this->getXi() <= left || this->getXf() >= right)
 		velx*=-1;
-	if (this->getYi() <= bottom || this->getYf() >= top)
+	if (this->getYf() >= top)
 		vely*=-1;
 	
 	if (moving)
