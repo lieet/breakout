@@ -15,13 +15,59 @@ using namespace std;
 int score, valueBlock;
 float anglex, angley, z;
 enum GameState {PAUSED, RUNNING, GAME_OVER, GAME_WON} game_state; //possíveis estados para o jogo
-bool showTextDetails = false, drawBB = true, acompanharBall = false;
+bool showTextDetails = false, acompanharBall = false;
 
 // Objetos do jogo
-Ball ball(1);
-Block player_block((left+right)/2, bottom+1, 0.2, 0.2, 0.2, 0, 1);
+Ball ball(OBJ_SIZE);
+Block player_block((left+right)/2, bottom+1, 0, OBJ_SIZE);
 vector<Block> blocosAtivos;
 vector<Block> blocosRemovidos;
+
+unsigned char * loadPPM(char *filename, int width, int height)
+{
+    FILE *arq = fopen(filename, "r");
+    char format[3];
+    int max;
+    fscanf(arq, "%s %d %d %d\n", format, &width, &height, &max);
+    unsigned char * data = (unsigned char *) malloc(sizeof(unsigned char)*width*height*3);
+    fread(data, sizeof(unsigned char), width*height*3, arq);
+    fclose(arq);
+    return data;
+}
+
+void loadBlockTexture()
+{  
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+
+    int width=1024, height=1024;
+	char filepath[] = "concrete.ppm";
+	unsigned char *data = loadPPM(filepath, width, height);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    free(data);
+}
+
+void loadFieldTexture()
+{  
+    glBindTexture(GL_TEXTURE_2D, 1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+
+    int width=1000, height=1000;
+	char filepath[] = "ice.ppm";
+	unsigned char *data = loadPPM(filepath, width, height);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    free(data);
+}
 
 //valor inteiro aleatório entre 0 e maxValue
 int randomi(int maxValue)
@@ -31,20 +77,20 @@ int randomi(int maxValue)
 
 void drawGameLimits()
 {
-	glColor4f(1, 1, 1, 1);
-	glBegin(GL_LINES); 
-		glVertex3f(left, bottom, 1);
-  		glVertex3f(left, top, 1);
-
-  		glVertex3f(left, bottom, 1);
-  		glVertex3f(right, bottom, 1);
-
-		glVertex3f(right, top, 1);
-  		glVertex3f(left, top, 1);
-  		
-  		glVertex3f(right, top, 1);
-  		glVertex3f(right, bottom, 1);
+	loadFieldTexture();
+	glEnable(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+		glNormal3f(0.0,0.0,1.0);
+		glTexCoord2f(0,0);
+		glVertex3f(left,bottom,0);
+		glTexCoord2f(1,0);
+		glVertex3f(right,bottom,0);
+		glTexCoord2f(1,1);
+		glVertex3f(right,top,0);
+		glTexCoord2f(0,1);
+		glVertex3f(left,top,0);
  	glEnd(); 
+ 	glDisable(GL_TEXTURE_2D);
 }
 
 void init() {
@@ -67,14 +113,14 @@ void init() {
 
 	player_block.x = (left+right)/2;
 
-	glClearColor(0.5, 0.5, 0.5, 0.0);
+	glClearColor(0.25, 0.25, 0.25, 0.0);
 
 	//cria barras aleatorias
 	for (float i = left+5; i < right-5; i += 6)
 	{
 		for (float j = top-10; j < top-2; j += 2)
 		{
-			Block block(i, j, .5, 1-j/top, j/top, valueBlock, 1);
+			Block block(i, j, valueBlock, OBJ_SIZE);
 			blocosAtivos.push_back(block);
 		}
 		valueBlock -= 5;
@@ -84,7 +130,7 @@ void init() {
 }
 
 void mainGame()
-{
+{	
 	if (drawBB)
 		drawGameLimits();
 	if (showTextDetails)
@@ -94,6 +140,9 @@ void mainGame()
 	ball.Update();
 	if (drawBB)
 		ball.DrawBoundingBox();
+
+	loadBlockTexture();
+	glEnable(GL_TEXTURE_2D);
 
 	//verifica se a bola ainda esta em jogo
 	if (ball.y <= bottom)
@@ -155,7 +204,7 @@ void displayCallback() {
 
 	atualizarCamera();
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (not ball.moving)
 	{
@@ -226,15 +275,13 @@ void keyboardCallback(unsigned char key, int x, int y) {
 	else if(key == 'o' and z < MAX_ZOOM_OUT)
 		z += 2;
 
-	if(key == 'b')
-		drawBB = not drawBB;
 	if(key == 't')
 		showTextDetails = not showTextDetails;
 	if(key == 'z')
 		acompanharBall = not acompanharBall;
 
 	if (key == 'c')
-		printf("c - commands:\n\nq - exit\np - pause/unpause\nr - restart\nd/a - move player\nspace - start the game\n\nk/i - move the camera\nu/o - zoom\nz - follow the ball\n\nb - draw bounding boxes\nt - show text details\n");
+		printf("c - commands\n\nq - exit\np - pause/unpause\nr - restart\nd/a - move player\nspace - start the game\n\nk/i - move the camera\nu/o - zoom\nz - follow the ball\nt - show text details\n");
 }
 
 //função executada periodicamente para inserir novos blocos
@@ -265,6 +312,7 @@ int main(int argc, char **argv) {
 	glutDisplayFunc(displayCallback);
 	glutTimerFunc(updateTimerMs, reporBlocos, 0);
 	glutIdleFunc(displayCallback);
+	loadBlockTexture();
 	init();
 	glutMainLoop();
 

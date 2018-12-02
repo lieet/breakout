@@ -8,10 +8,6 @@ Ball::Ball(float raio)
 {
 	this->raio = raio;
 
-	this->r = 0;
-	this->g = 0;
-	this->b = 0;
-
 	this->scalex = .5;
 	this->scaley = .5;
 	this->scalez = .5;
@@ -22,7 +18,7 @@ Ball::Ball(float raio)
 
 void Ball::Draw()
 {
-	glColor4f(r, g, b, 1);
+	glColor4f(0, 0, 0, 1);
 	glPushMatrix();
 		glTranslatef(x, y, 0);
 		glScalef(scalex, scaley, scalez);
@@ -32,11 +28,11 @@ void Ball::Draw()
 
 void Ball::DrawBoundingBox()
 {
-	glColor4f(1-r, 1-g, 1-b, 1);
+	glColor4f(1, 1, 1, 1);
 	glBegin(GL_LINE_LOOP);
-		for(float a = 0; a < 2*M_PI; a+=0.1) {
-			glVertex2f(x + raio/2.0*cos(a), y + raio/2.0*sin(a));
-		}
+	/*for(float a = 0; a < 2*M_PI; a+=0.1) {
+		glVertex2f(x + raio/2.0*cos(a), y + raio/2.0*sin(a));
+	}*/
 	glEnd();
 }
 

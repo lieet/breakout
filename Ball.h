@@ -17,6 +17,7 @@ public:
 	void Update();
 	void Move(float, float);
 	bool checkCollision(Block);
+	
 	float getXi();
 	float getXf();
 	float getYi();
