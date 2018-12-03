@@ -137,7 +137,11 @@ void mainGame()
 		printScore(score);
 
 	//desenha a bola
-	ball.Update();
+	if (ball.moving)
+	{
+		ball.Update();
+	}
+	ball.Draw();
 	if (drawBB)
 		ball.DrawBoundingBox();
 
@@ -205,13 +209,6 @@ void displayCallback() {
 	atualizarCamera();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	if (not ball.moving)
-	{
-		ball.Draw();
-		if (drawBB)
-			ball.DrawBoundingBox();
-	}
 
 	switch (game_state)
 	{
