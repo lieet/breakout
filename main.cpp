@@ -309,6 +309,19 @@ int main(int argc, char **argv) {
 	glutCreateWindow("Breakout - By Emanoel Dantas e Lucas Alessio");
 	glutKeyboardFunc(keyboardCallback);
 	glutMouseFunc(NULL);
+	
+	//Iluminação
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	GLfloat vetorPosicao[4] = {1.5, 2.3, 1.4, 1.0}; //coordenadas homogêneas
+	glLightfv(GL_LIGHT0, GL_POSITION, vetorPosicao); 
+	GLfloat vetorCor[4] = {0.5, 0.5, 0.5, 1.0}; //RGBA
+	glLightfv(GL_LIGHT0, GL_AMBIENT, vetorCor);
+	
+	//Especificando o material dos objetos
+	glEnable(GL_COLOR_MATERIAL);
+	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
 	glutDisplayFunc(displayCallback);
 	glutTimerFunc(updateTimerMs, reporBlocos, 0);
 	glutIdleFunc(displayCallback);
