@@ -307,10 +307,13 @@ int main(int argc, char **argv) {
 	glutKeyboardFunc(keyboardCallback);
 	glutMouseFunc(NULL);
 	
+	float centerx = (left+right)/2.0;
+	float centery = (bottom+top)/2.0;
+
 	//Iluminação
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	GLfloat vetorPosicao[4] = {1.5, 2.3, 1.4, 1.0}; //coordenadas homogêneas
+	GLfloat vetorPosicao[4] = {centerx, centery, 2, 1.0}; //coordenadas homogêneas
 	glLightfv(GL_LIGHT0, GL_POSITION, vetorPosicao); 
 	GLfloat vetorCor[4] = {0.5, 0.5, 0.5, 1.0}; //RGBA
 	glLightfv(GL_LIGHT0, GL_AMBIENT, vetorCor);
